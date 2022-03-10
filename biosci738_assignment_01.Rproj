@@ -1,13 +1,8 @@
-Version: 1.0
+require(tidyverse)
+## loading the data
+library(readr)
+url <- "https://raw.githubusercontent.com/STATS-UOA/databunker/master/data/dicots_proportions.csv"
+data <- read_csv(url)
+## grouping the data into calluna vulgaris and treatment only
+callunavulgaris_data <- data %>% select(starts_with("Calluna"), `Treat!`)
 
-RestoreWorkspace: Default
-SaveWorkspace: Default
-AlwaysSaveHistory: Default
-
-EnableCodeIndexing: Yes
-UseSpacesForTab: Yes
-NumSpacesForTab: 2
-Encoding: UTF-8
-
-RnwWeave: Sweave
-LaTeX: pdfLaTeX
