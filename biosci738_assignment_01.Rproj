@@ -1,5 +1,4 @@
 
-install.packages(tidyverse)
 ## loading the data
 library(readr)
 url <- "https://raw.githubusercontent.com/STATS-UOA/databunker/master/data/dicots_proportions.csv"
