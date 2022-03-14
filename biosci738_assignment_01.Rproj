@@ -1,0 +1,15 @@
+require(tidyverse)
+## loading the data
+library(readr)
+url <- "https://raw.githubusercontent.com/STATS-UOA/databunker/master/data/dicots_proportions.csv"
+data <- read_csv(url)
+## grouping the data into calluna vulgaris and treatment only
+callunavulgaris_data <- data %>% select(starts_with("Calluna"), `Treat!`) 
+ 
+## rename columns to match the dataset 
+names(callunavulgaris_data)[1] <- '2008'
+names(callunavulgaris_data)[2] <- '2009'
+names(callunavulgaris_data)[3] <- '2010'
+names(callunavulgaris_data)[4] <- '2012'
+names(callunavulgaris_data)[5] <- 'Treatment'
+
