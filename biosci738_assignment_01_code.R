@@ -23,3 +23,13 @@ callunavulgaris_treatment_B <- subset(callunavulgaris_data, Treatment=="B")
 callunavulgaris_treatment_C <- subset(callunavulgaris_data, Treatment=="C")
 callunavulgaris_treatment_HB <- subset(callunavulgaris_data, Treatment=="HB")
 callunavulgaris_treatment_H <- subset(callunavulgaris_data, Treatment=="H")
+
+percent()
+
+# calculate the mean for the data frames
+meancover_2008_B <- mean(callunavulgaris_treatment_B$`2008`)
+meancover_2009_B <- mean(callunavulgaris_treatment_B$`2009`)
+meancover_2010_B <- mean(callunavulgaris_treatment_B$`2010`)
+meancover_2012_B <- mean(callunavulgaris_treatment_B$`2012`)
+
+
