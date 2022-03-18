@@ -24,7 +24,7 @@ callunavulgaris_treatment_C <- subset(callunavulgaris_data, Treatment=="C")
 callunavulgaris_treatment_HB <- subset(callunavulgaris_data, Treatment=="HB")
 callunavulgaris_treatment_H <- subset(callunavulgaris_data, Treatment=="H")
 
-percent()
+# im not stupid, oscar
 
 # calculate the mean for the data frames
 meancover_2008_B <- mean(callunavulgaris_treatment_B$`2008`)
