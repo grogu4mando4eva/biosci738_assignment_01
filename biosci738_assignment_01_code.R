@@ -1,6 +1,7 @@
 #load dataset into R
 require(tidyverse)
 require(dplyr)
+require(scales)
 library(readr)
 url <- "https://raw.githubusercontent.com/STATS-UOA/databunker/master/data/dicots_proportions.csv"
 data <- read_csv(url)
@@ -11,25 +12,54 @@ callunavulgaris_data <- data %>% select(starts_with("Calluna"), `Treat!`)
 #save dataframe in project folder
 save(callunavulgaris_data, file = "callunavulgaris_data.RData")
 
+# pivot long rather than wide 
+calluna_long <- pivot_longer(callunavulgaris_data, 
+                            cols = starts_with("Calluna"), 
+                                     names_to = "Year", values_to = "Spread")
+
 ## rename columns to match the dataset 
-names(callunavulgaris_data)[1] <- '2008'
-names(callunavulgaris_data)[2] <- '2009'
-names(callunavulgaris_data)[3] <- '2010'
-names(callunavulgaris_data)[4] <- '2012'
-names(callunavulgaris_data)[5] <- 'Treatment'
+names(calluna_long)[1] <- 'Treatment'
 
-#extrapolating the data sets based on treatment type
-callunavulgaris_treatment_B <- subset(callunavulgaris_data, Treatment=="B")
-callunavulgaris_treatment_C <- subset(callunavulgaris_data, Treatment=="C")
-callunavulgaris_treatment_HB <- subset(callunavulgaris_data, Treatment=="HB")
-callunavulgaris_treatment_H <- subset(callunavulgaris_data, Treatment=="H")
+#find the index (place in the column) where the "Year" column ends with "08"
+index_08 <- which(endsWith(calluna_long$Year,"08"))
+print(index_08)
 
-# im not stupid, oscar
+#for every index in the "Year" column. Change it to "2008"
+for (index in index_08){
+  calluna_long$Year[index] <- "2008"
+}
 
-# calculate the mean for the data frames
-meancover_2008_B <- mean(callunavulgaris_treatment_B$`2008`)
-meancover_2009_B <- mean(callunavulgaris_treatment_B$`2009`)
-meancover_2010_B <- mean(callunavulgaris_treatment_B$`2010`)
-meancover_2012_B <- mean(callunavulgaris_treatment_B$`2012`)
+#find the index (place in the column) where the "Year" column ends with "09"
+index_09 <- which(endsWith(calluna_long$Year,"09"))
+print(index_09)
 
+#for every index in the "Year" column. Change it to "2009"
+for (index in index_09){
+  calluna_long$Year[index] <- "2009"
+}
+
+
+#find the index (place in the column) where the "Year" column ends with "10"
+index_10 <- which(endsWith(calluna_long$Year,"10"))
+print(index_10)
+
+#for every index in the "Year" column. Change it to "2010"
+for (index in index_10){
+  calluna_long$Year[index] <- "2010"
+}
+
+
+#find the index (place in the column) where the "Year" column ends with "12"
+index_12 <- which(endsWith(calluna_long$Year,"12"))
+print(index_12)
+
+#for every index in the "Year" column. Change it to "2012"
+for (index in index_12){
+  calluna_long$Year[index] <- "2012"
+}
+
+
+# # for every numeric value in the "Spread" column, multiply by 100
+# x100 <- function(x){x * 100}
+# mutate_each(calluna_long$Spread, function(x100), names(which(calluna_long$Spread)))
 
