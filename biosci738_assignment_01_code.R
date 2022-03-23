@@ -3,6 +3,7 @@ require(tidyverse)
 require(dplyr)
 require(scales)
 library(readr)
+install.packages("plotrix")
 url <- "https://raw.githubusercontent.com/STATS-UOA/databunker/master/data/dicots_proportions.csv"
 data <- read_csv(url)
 
@@ -38,7 +39,6 @@ for (index in index_09){
   calluna_long$Year[index] <- "2009"
 }
 
-
 #find the index (place in the column) where the "Year" column ends with "10"
 index_10 <- which(endsWith(calluna_long$Year,"10"))
 print(index_10)
@@ -47,7 +47,6 @@ print(index_10)
 for (index in index_10){
   calluna_long$Year[index] <- "2010"
 }
-
 
 #find the index (place in the column) where the "Year" column ends with "12"
 index_12 <- which(endsWith(calluna_long$Year,"12"))
@@ -58,8 +57,26 @@ for (index in index_12){
   calluna_long$Year[index] <- "2012"
 }
 
+# wrangle the spread into percentage format
+calluna_long <- calluna_long %>% 
+  select(Treatment, Year, Spread)%>%
+  mutate(     
+    Spread = Spread * 100)
 
-# # for every numeric value in the "Spread" column, multiply by 100
-# x100 <- function(x){x * 100}
-# mutate_each(calluna_long$Spread, function(x100), names(which(calluna_long$Spread)))
+# find the mean and sd/se for the treatment type and year 
+calluna_mean <- calluna_long %>% 
+  group_by(Treatment, Year) %>% 
+  summarise(., mean_year_treatment = mean(Spread), sd = sd(Spread), n = n(), se = sd / sqrt(n))
+calluna_mean$mean_year_treatment = as.numeric(calluna_mean$mean_year_treatment)
 
+## ggplot line graph 
+ggplot2::ggplot(data = calluna_mean, aes(x = Year, y = mean_year_treatment, group = Treatment)) + 
+  geom_errorbar(aes(ymin=mean_year_treatment-se, ymax=mean_year_treatment+se ), width=.1) +
+  geom_line(aes(linetype = Treatment)) + 
+  geom_point(aes(shape = Treatment)) + xlab("Year") + ylab("Percentage Cover") +
+  scale_x_discrete(limit = c("2008", "2009", "2010", "2011", "2012")) +
+  scale_y_continuous(
+    n.breaks = 7, 
+    limits = NULL,
+    )
+  
