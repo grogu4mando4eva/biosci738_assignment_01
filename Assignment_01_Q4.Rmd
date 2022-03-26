@@ -1,14 +1,31 @@
-#load dataset into R
-require(tidyverse)
-require(dplyr)
-require(scales)
-library(readr)
-install.packages("plotrix")
-url <- "https://raw.githubusercontent.com/STATS-UOA/databunker/master/data/dicots_proportions.csv"
-data <- read_csv(url)
+---
+output:
+  pdf_document: default
+---
 
+**Question 4** - Letting μt:y be the mean percentage cover for treatment level t in year y test the following hypothesis. Use a randomisation test in each case with 49 and then again with 499 resamples. [15 marks]
+
+
+```{r, results = 'hide', eval=TRUE}
+library(tidyverse)
+library(dplyr)
+library(scales)
+library(readr)
+```
+```{r, echo=FALSE}
+url <- "C:/Users/omcla/Documents/Test/biosci738_assignment_01/dicots_proportions.csv" #obtains data from Local
+data <- read_csv(url) #places data into variable "data"
+```
+```{r, eval=FALSE}
+## url <- "https://raw.githubusercontent.com/STATS-UOA/databunker/master/data/dicots_proportions.csv" #obtains data from GitHub URL
+## data <- read_csv(url) #places data into variable "data"
+```
+
+Code chunk for Data Manipulation
+
+```{r, results = 'hide', eval=TRUE}
 #extract the calluna data from the dataset
-callunavulgaris_data <- data %>% select(starts_with("Calluna"), `Treat!`)
+callunavulgaris_data <- data %>% select(starts_with("Calluna"), "Treat!")
 
 #save dataframe in project folder
 save(callunavulgaris_data, file = "callunavulgaris_data.RData")
@@ -69,31 +86,6 @@ calluna_mean <- calluna_long %>%
   summarise(., mean_year_treatment = mean(Spread), sd = sd(Spread), n = n(), se = sd / sqrt(n))
 calluna_mean$mean_year_treatment = as.numeric(calluna_mean$mean_year_treatment)
 
-## ggplot line graph 
-ggplot2::ggplot(data = calluna_mean, aes(x = Year, y = mean_year_treatment, group = Treatment)) + 
-  geom_errorbar(aes(ymin=mean_year_treatment-se, ymax=mean_year_treatment+se ), width=.1) +
-  geom_line(aes(linetype = Treatment)) + 
-  geom_point(aes(shape = Treatment)) + xlab("Year") + ylab("Percentage Cover") +
-  scale_x_discrete(limit = c("2008", "2009", "2010", "2011", "2012"), expand = c(0,0)) +
-  scale_y_continuous(
-    n.breaks = 7, 
-    limits = c(0, 70),
-    )
- 
-## ggplot line graph IMPROVED GRAPH
-ggplot2::ggplot(data = calluna_mean, aes(x = Year, y = mean_year_treatment, group = Treatment)) + 
-  geom_errorbar(aes(ymin=mean_year_treatment-se, ymax=mean_year_treatment+se, colour = Treatment ), width=.1) +
-  geom_line(aes(linetype = Treatment, colour = Treatment)) + 
-  theme_minimal() + 
-  ggtitle("Percentage Ground Cover of Heather \n by Treatment Type")+
-  labs(caption = "Percentage of ground cover of heather based on treatment \n types introduced to Tongariro National Park from 2008-2012. \n B = biocontrol, C = control, H = herbicide, HB = herbicide + biocontrol")+
-  geom_point(aes(shape = Treatment, colour = Treatment)) + xlab("Year") + ylab("% Ground Cover") +
-  scale_x_discrete(limit = c("2008", "2009", "2010", "2011", "2012"), expand = c(0,0)) +
-  scale_y_continuous(
-    n.breaks = 7, 
-    limits = c(0, 70),
-  )
- 
 
 ## wrangle the data to have only 2008 and 2012 
 
@@ -104,7 +96,12 @@ calluna_8_12 <- calluna_long[!(calluna_long$Year == '2009' |calluna_long$Year ==
 
 calluna_B <- subset(calluna_8_12, Treatment == 'B')
 calluna_C <- subset(calluna_8_12, Treatment == 'C')
+```
 
+H0: mean % cover for Control treatment 2012 = mean % cover for Control treatment 2008
+H1: mean % cover for Control treatment 2012 /=/ mean % cover for Control treatment 2008
+
+```{r echo=FALSE}
 ## randomisation test for Control subset 49 
 
 diff_in_means_C <- (calluna_C %>% group_by(Year)%>% 
@@ -112,7 +109,10 @@ diff_in_means_C <- (calluna_C %>% group_by(Year)%>%
   summarise(diff = diff(mean_C)))$diff
 
 diff_in_means_C
-------------------------------------------------------------------------------------------------------------------------
+```
+
+```{r, echo = FALSE}
+
 nreps_49_C <- 49 # number of times I want to randomise
 
 #empty array
@@ -136,7 +136,9 @@ results_49_C <- pivot_longer(results_49_C, cols = everything())
 n_exceed_49C <- sum(abs(results_49_C$value) >= abs(diff_in_means_C))
 n_exceed_49C/nreps_49_C ## this is my p value for 49 reps of randomisation of B
 
----------------------------------------------------------------------------------------------------------------------------
+```
+
+```{r, echo = FALSE}
 ## randomisation test for Control subset 499 times 
 
 nreps_499_C <- 499 # number of times I want to randomise
@@ -162,7 +164,14 @@ print(results_499_C$value)
 ## calculate the p value 
 n_exceed_499C <- sum(abs(results_49_C$value) >= abs(diff_in_means_C))
 n_exceed_499C/nreps_499_C ## this is my p value for 49 reps of randomisation of B
-----------------------------------------------------------------------------------------------------------
+```
+
+
+
+H0: mean % cover for Biocontrol treatment 2012 = mean % cover for Biocontrol treatment 2008
+H1: mean % cover for Biocontrol treatment 2012 /=/ mean % cover for Biocontrol treatment 2008
+
+```{r, echo=FALSE}
 ## randomisation test for BIOCONTROL subset 49 
 
 diff_in_means_B <- (calluna_B %>% group_by(Year)%>% 
@@ -170,7 +179,9 @@ diff_in_means_B <- (calluna_B %>% group_by(Year)%>%
                       summarise(diff = diff(mean_B)))$diff
 
 diff_in_means_B
--------------------------------------------------------------------------------------------------------
+```
+
+```{r, echo=FALSE}
 nreps_49_B <- 49 # number of times I want to randomise
 
 #empty array
@@ -194,7 +205,9 @@ results_49_B <- pivot_longer(results_49_B, cols = everything())
 n_exceed_49B <- sum(abs(results_49_B$value) >= abs(diff_in_means_B))
 n_exceed_49B/nreps_49_B ## this is my p value for 49 reps of randomisation of B
 
-----------------------------------------------------------------------------------------------------------
+```
+
+```{r, echo=FALSE}
 ## randomisation test for BIOCONTROL subset 499 
 
 nreps_499_B <- 499 # number of times I want to randomise
@@ -219,8 +232,24 @@ results_499_B <- pivot_longer(results_499_B, cols = everything())
 ## calculate the p value 
 n_exceed_499B <- sum(abs(results_49_B$value) >= abs(diff_in_means_B))
 n_exceed_499B/nreps_499_B ## this is my p value for 49 reps of randomisation of B
+```
 
+Observed Test Statistic for Permutation Tests:
 
+Control: 
+```{r echo=FALSE}
+print(diff_in_means_C)
+```
+
+Biocontrol:
+```{r, echo=FALSE}
+print(diff_in_means_B)
+```
+
+Permutation Tests
+
+P-value for Control:
+```{r, echo=FALSE}
 ## PERMUTATION TESTS
 
 #control 
@@ -229,13 +258,28 @@ permtest_combn_C <- apply(combinations_C, 2, function(x)
   mean(calluna_C$Spread[x]) - mean(calluna_C$Spread[-x]))
 p_val_C <- length(permtest_combn_C[abs(permtest_combn_C) >= diff_in_means_C]) / choose(12,6)
 p_val_C
+```
 
+P-value for Biocontrol:
+```{r, echo=FALSE}
 #biocontrol
 combinations_B <- combn(12,6)
 permtest_combn_B <- apply(combinations_B, 2, function(x)
   mean(calluna_B$Spread[x]) - mean(calluna_B$Spread[-x]))
 p_val_B <- length(permtest_combn_B[abs(permtest_combn_B) >= abs(diff_in_means_B)]) / choose(12,6)
 p_val_B
+```
+
+The above p-values show what you would expect from the results - that the control does not show a low p-value, i.e. the result we received was statistically likely to occur. Therefore we accept the null hypothesis that there is no difference in means between the controls. 
+Conversely, the p-value for the biocontrol subset supports the hypothesis that there is a difference between the means between 2008 and 2012, showing the biocontrol treatment had a significant effect on the percentage of ground cover of heather. 
+
+
+**Histograms**
+
+Control:
+
+```{r, echo=FALSE}
+
 
 ## HISTOGRAM
 
@@ -249,3 +293,9 @@ hist(permtest_combn_B,
      xlab='Differences Between Randomised Group Means',
      main='Permutation Test (Biocontrol)')
 abline(v = diff_in_means_B, col = "red")
+```
+
+
+From the histograms I think it backs up the conclusions drawn from the p-values. The control histogram clearly shows the observed test statistic within the normal range of the expected observations, ie an expected result within the null hypothesis. 
+
+The histogram for the biocontrol subset, however, shows the observed test statistic outside of the normal range of expected results showing that something has acted to disprove the null hypothesis (ie the biocontrol treatment). 
